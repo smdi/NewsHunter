@@ -6,12 +6,7 @@
     <uses-permission android:name="android.permission. ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <uses-feature
-        android:name="android.hardware.location"
-        android:required="true" />
-    <uses-feature
-        android:name="android.hardware.location.gps"
-        android:required="true" />
+
 
     <application
         android:allowBackup="true"
@@ -20,7 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".NewsScreen">
+        <activity android:name=".View.NewsScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
