@@ -2,6 +2,7 @@ package newapp.com.newshunter.View;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 
@@ -9,13 +10,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +20,12 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import newapp.com.newshunter.Model.APIInterface;
 import newapp.com.newshunter.Model.ApiClient;
 import newapp.com.newshunter.Model.CountryFinder;
@@ -31,9 +33,8 @@ import newapp.com.newshunter.Model.NewsAdapter;
 import newapp.com.newshunter.Model.NewsList;
 import newapp.com.newshunter.Model.RetrofitResponseListener;
 import newapp.com.newshunter.R;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import newapp.com.newshunter.ViewModel.NewsScreenViewModel;
+
 
 public class NewsScreen extends AppCompatActivity implements LocationListener {
 
@@ -44,6 +45,8 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
     private List<NewsList.Datum> listView;
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
+    private NewsScreenViewModel newsScreenViewModel;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +59,11 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
 
     private void initialise() {
 
+
+        progressDialog = new ProgressDialog(NewsScreen.this);
+        progressDialog.setMessage("Loading");
+        progressDialog.setCancelable(false);
+        progressDialog.setCanceledOnTouchOutside(false);
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         apiInterface = ApiClient.getClient().create(APIInterface.class);
@@ -75,10 +83,31 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
 
+            progressDialog.show();
+
             location = getLocationData();
             country = CountryFinder.getCountryName(getApplicationContext(),location.getLatitude(),location.getLongitude());
 
 
+            newsScreenViewModel = new ViewModelProvider(this ,new NewsFactory(getApplicationContext(), "us", "business" )).get(NewsScreenViewModel.class);
+
+            newsScreenViewModel.getNewsList(new RetrofitResponseListener() {
+                @Override
+                public void onFailure() {
+                    Toast.makeText(getApplicationContext(),"No data found",Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                }
+
+                @Override
+                public void onSuccess(NewsList body) {
+
+                    listView = body.articles;
+                    adapter = new NewsAdapter(getApplicationContext(),listView , NewsScreen.this);
+                    recyclerView.setAdapter(adapter);
+                    progressDialog.dismiss();
+
+                }
+            });
         }
         else {
             Toast.makeText(getApplicationContext(),"Location Permission not granted",Toast.LENGTH_SHORT).show();
@@ -86,49 +115,9 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
         }
 
 
-        getNewsList(new RetrofitResponseListener() {
-            @Override
-            public void onFailure() {
-                Toast.makeText(getApplicationContext(),"failure method",Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onSuccess(NewsList body) {
-
-                listView = body.articles;
-                adapter = new NewsAdapter(getApplicationContext(),listView , NewsScreen.this);
-                recyclerView.setAdapter(adapter);
-
-            }
-        });
-
     }
 
-    private void getNewsList(final RetrofitResponseListener retrofitResponseListener) {
 
-        Call<NewsList> call = apiInterface.getNewsList("us","67c6296f19c2443d861fd6a878dd3548");
-        call.enqueue(new Callback<NewsList>() {
-            @Override
-            public void onResponse(Call<NewsList> call, Response<NewsList> response) {
-
-                Toast.makeText(getApplicationContext(),""+response.body(),Toast.LENGTH_SHORT).show();
-                if(response.isSuccessful()){
-                    retrofitResponseListener.onSuccess(response.body());
-                }
-                else {
-
-                    retrofitResponseListener.onFailure();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<NewsList> call, Throwable t) {
-                call.cancel();
-                Toast.makeText(getApplicationContext(),""+t,Toast.LENGTH_SHORT).show();
-            }
-        });
-
-    }
 
     @SuppressLint("MissingPermission")
     private Location getLocationData() {
@@ -147,12 +136,55 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
 
                     Toast.makeText(getApplicationContext(),"Location Permission granted",Toast.LENGTH_SHORT).show();
 
+//                    progressDialog.show();
+
                     location = getLocationData();
                     country = CountryFinder.getCountryName(getApplicationContext(),location.getLatitude(),location.getLongitude());
+
+
+                    newsScreenViewModel = new ViewModelProvider(this , new NewsFactory(getApplicationContext(),"us","business" )).get(NewsScreenViewModel.class);
+
+
+                    newsScreenViewModel.getNewsList(new RetrofitResponseListener() {
+                        @Override
+                        public void onFailure() {
+                            Toast.makeText(getApplicationContext(),"No data found",Toast.LENGTH_SHORT).show();
+                            progressDialog.dismiss();
+                        }
+
+                        @Override
+                        public void onSuccess(NewsList body) {
+
+                            listView = body.articles;
+                            adapter = new NewsAdapter(getApplicationContext(),listView , NewsScreen.this);
+                            recyclerView.setAdapter(adapter);
+                            progressDialog.dismiss();
+
+                        }
+                    });
 
                 } else {
                     // permission denied, boo! Disable the
                     // load default country India
+                    Toast.makeText(getApplicationContext(),"loading default",Toast.LENGTH_SHORT).show();
+                    newsScreenViewModel = new ViewModelProvider(this , new NewsFactory(getApplicationContext(),"us","business" )).get(NewsScreenViewModel.class);
+                    newsScreenViewModel.getNewsList(new RetrofitResponseListener() {
+                        @Override
+                        public void onFailure() {
+                            progressDialog.dismiss();
+                            Toast.makeText(getApplicationContext(),"No data found",Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onSuccess(NewsList body) {
+
+                            listView = body.articles;
+                            adapter = new NewsAdapter(getApplicationContext(),listView , NewsScreen.this);
+                            recyclerView.setAdapter(adapter);
+                            progressDialog.dismiss();
+                        }
+                    });
+
                 }
                 return;
             }
@@ -175,6 +207,26 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
             else{
                 //load data related to another country
                 country = CountryFinder.getCountryName(getApplicationContext(),location.getLatitude(),location.getLongitude());
+
+
+                newsScreenViewModel = new ViewModelProvider(this , new NewsFactory(getApplicationContext(),"us","business" )).get(NewsScreenViewModel.class);
+                newsScreenViewModel.getNewsList(new RetrofitResponseListener() {
+                    @Override
+                    public void onFailure() {
+                        progressDialog.dismiss();
+                        Toast.makeText(getApplicationContext(),"No data found",Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onSuccess(NewsList body) {
+
+                        listView = body.articles;
+                        adapter = new NewsAdapter(getApplicationContext(),listView , NewsScreen.this);
+                        recyclerView.setAdapter(adapter);
+                        progressDialog.dismiss();
+                    }
+                });
+
 
             }
 
