@@ -4,6 +4,8 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -16,11 +18,16 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 public class NewsScreen extends AppCompatActivity implements LocationListener {
 
     private LocationManager locationManager;
     private TextView locationtv;
     private Location location;
+    private String country;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +44,8 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
             // TODO: Consider calling
 
             location = getLocationData();
-            locationtv.setText(location+" Location");
+            country = getCountryName(getApplicationContext(),location.getLatitude(),location.getLongitude());
+            locationtv.setText(country);
 
         }
         else {
@@ -64,8 +72,7 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
                     Toast.makeText(getApplicationContext(),"Location Permission granted",Toast.LENGTH_SHORT).show();
 
                     location = getLocationData();
-                    locationtv.setText("Location "+location);
-
+                    locationtv.setText(getCountryName(getApplicationContext(),location.getLatitude(),location.getLongitude()));
 
                 } else {
                     // permission denied, boo! Disable the
@@ -76,10 +83,41 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
         }
     }
 
+    public static String getCountryName(Context context, double latitude, double longitude) {
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+        List<Address> addresses = null;
+        try {
+            addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            Address result;
+
+            if (addresses != null && !addresses.isEmpty()) {
+                return addresses.get(0).getCountryName();
+            }
+            return null;
+        } catch (IOException ignored) {
+            //do something
+        }
+        return "";
+    }
+
     @Override
     public void onLocationChanged(Location location) {
-        Toast.makeText(getApplicationContext(),"Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude(),Toast.LENGTH_LONG).show();
-        locationtv.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
+
+        if(country == null){
+            country = getCountryName(getApplicationContext(),location.getLatitude(),location.getLongitude());
+        }
+        else {
+
+            if(country.equals(getCountryName(getApplicationContext(),location.getLatitude(),location.getLongitude()))){
+                    //same country dont load new data
+            }
+            else{
+                //load data related to another country
+                country = getCountryName(getApplicationContext(),location.getLatitude(),location.getLongitude());
+                
+            }
+
+        }
     }
 
     @Override
