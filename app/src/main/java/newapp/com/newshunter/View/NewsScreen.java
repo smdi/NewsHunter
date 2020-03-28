@@ -26,7 +26,9 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.onesignal.NotificationExtenderService;
 import com.onesignal.OSNotificationOpenResult;
+import com.onesignal.OSNotificationReceivedResult;
 import com.onesignal.OneSignal;
 
 import org.json.JSONObject;
@@ -112,7 +114,7 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
             country = CountryFinder.getCountryName(getApplicationContext(),location.getLatitude(),location.getLongitude());
 
 
-            newsScreenViewModel = new ViewModelProvider(this ,new NewsFactory(getApplicationContext(), country, "business" )).get(NewsScreenViewModel.class);
+            newsScreenViewModel = new ViewModelProvider(this ,new NewsFactory(getApplicationContext(), "us", "business" )).get(NewsScreenViewModel.class);
 
             newsScreenViewModel.getNewsList(new RetrofitResponseListener() {
                 @Override
@@ -185,6 +187,9 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
     }
 
 
+
+
+
     @SuppressLint("MissingPermission")
     private Location getLocationData() {
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
@@ -208,7 +213,7 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
                     country = CountryFinder.getCountryName(getApplicationContext(),location.getLatitude(),location.getLongitude());
 
 
-                    newsScreenViewModel = new ViewModelProvider(this , new NewsFactory(getApplicationContext(),country,"business" )).get(NewsScreenViewModel.class);
+                    newsScreenViewModel = new ViewModelProvider(this , new NewsFactory(getApplicationContext(),"us","business" )).get(NewsScreenViewModel.class);
 
 
                     newsScreenViewModel.getNewsList(new RetrofitResponseListener() {
@@ -275,7 +280,7 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
                 country = CountryFinder.getCountryName(getApplicationContext(),location.getLatitude(),location.getLongitude());
 
 
-                newsScreenViewModel = new ViewModelProvider(this , new NewsFactory(getApplicationContext(),country,"business" )).get(NewsScreenViewModel.class);
+                newsScreenViewModel = new ViewModelProvider(this , new NewsFactory(getApplicationContext(),"us","business" )).get(NewsScreenViewModel.class);
                 newsScreenViewModel.getNewsList(new RetrofitResponseListener() {
                     @Override
                     public void onFailure() {
