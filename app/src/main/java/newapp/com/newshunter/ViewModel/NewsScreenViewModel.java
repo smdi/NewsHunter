@@ -3,7 +3,6 @@ package newapp.com.newshunter.ViewModel;
 import android.content.Context;
 import android.widget.Toast;
 
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModel;
 import newapp.com.newshunter.Model.APIInterface;
 import newapp.com.newshunter.Model.ApiClient;

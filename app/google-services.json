@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "638120766770",
+    "firebase_url": "https://newshunter-eabb3.firebaseio.com",
+    "project_id": "newshunter-eabb3",
+    "storage_bucket": "newshunter-eabb3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:638120766770:android:018a5c0e38d236268dbb2b",
+        "android_client_info": {
+          "package_name": "newapp.com.newshunter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "638120766770-2h1iujvo1drsv2o3eesqfe7di0fnr91u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3x6pa5Sw1DQKiPVOxSbFJ7z5-4Q4EHZA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "638120766770-2h1iujvo1drsv2o3eesqfe7di0fnr91u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

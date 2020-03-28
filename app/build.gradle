@@ -1,9 +1,33 @@
+
+
+buildscript {
+    repositories {
+        maven { url 'https://plugins.gradle.org/m2/'}
+    }
+    dependencies {
+        classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.12.4, 0.99.99]'
+    }
+}
+apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'
+
+repositories {
+    maven { url 'https://maven.google.com' }
+}
+
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+
 
 android {
+
     compileSdkVersion 28
     defaultConfig {
         applicationId "newapp.com.newshunter"
+        manifestPlaceholders = [
+                onesignal_app_id: 'e542179d-5820-4a29-9f46-90807cec7c01',
+                // Project number pulled from dashboard, local value is ignored.
+                onesignal_google_project_number: 'REMOTE'
+        ]
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 1
@@ -44,4 +68,14 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel:2.2.0"
     implementation "androidx.lifecycle:lifecycle-extensions:2.1.0"
     annotationProcessor "androidx.lifecycle:lifecycle-compiler:2.1.0"
+
+
+    //firebase
+    implementation 'com.google.firebase:firebase-analytics:17.2.2'
+
+    //ads
+    implementation 'com.google.android.gms:play-services-ads:19.0.1'
+
+    //onesignal
+    implementation 'com.onesignal:OneSignal:[3.13.0, 3.99.99]'
 }

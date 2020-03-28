@@ -17,6 +17,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.onesignal.OneSignal;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +56,7 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
     private RecyclerView.Adapter adapter;
     private NewsScreenViewModel newsScreenViewModel;
     private ProgressDialog progressDialog;
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +65,16 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
 
         initialise();
 
+
+
     }
 
     private void initialise() {
 
+
+        adinitialiser();
+
+        onesignalInitialiser();
 
         progressDialog = new ProgressDialog(NewsScreen.this);
         progressDialog.setMessage("Loading");
@@ -76,7 +92,7 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
-        listView = new ArrayList();
+
 
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
@@ -117,6 +133,28 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
 
     }
 
+    private void onesignalInitialiser() {
+        // OneSignal Initialization
+        OneSignal.startInit(this)
+                .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+                .unsubscribeWhenNotificationsAreDisabled(true)
+                .init();
+    }
+
+    private void adinitialiser() {
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+
+
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
+    }
 
 
     @SuppressLint("MissingPermission")
