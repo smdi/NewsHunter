@@ -112,7 +112,7 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
             country = CountryFinder.getCountryName(getApplicationContext(),location.getLatitude(),location.getLongitude());
 
 
-            newsScreenViewModel = new ViewModelProvider(this ,new NewsFactory(getApplicationContext(), "us", "business" )).get(NewsScreenViewModel.class);
+            newsScreenViewModel = new ViewModelProvider(this ,new NewsFactory(getApplicationContext(), country, "business" )).get(NewsScreenViewModel.class);
 
             newsScreenViewModel.getNewsList(new RetrofitResponseListener() {
                 @Override
@@ -157,7 +157,7 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
 
 
             Log.d("APP  " +result.notification.payload.launchURL, "Notification clicked");
-            Toast.makeText(getApplicationContext(),""+result,Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getApplicationContext(),""+result,Toast.LENGTH_SHORT).show();
 
             String url = result.notification.payload.launchURL;
 
@@ -208,7 +208,7 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
                     country = CountryFinder.getCountryName(getApplicationContext(),location.getLatitude(),location.getLongitude());
 
 
-                    newsScreenViewModel = new ViewModelProvider(this , new NewsFactory(getApplicationContext(),"us","business" )).get(NewsScreenViewModel.class);
+                    newsScreenViewModel = new ViewModelProvider(this , new NewsFactory(getApplicationContext(),country,"business" )).get(NewsScreenViewModel.class);
 
 
                     newsScreenViewModel.getNewsList(new RetrofitResponseListener() {
@@ -230,8 +230,8 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
                     });
 
                 } else {
-                    // permission denied, boo! Disable the
-                    // load default country India
+                    // permission denied
+                    // load default country us
                     Toast.makeText(getApplicationContext(),"loading default",Toast.LENGTH_SHORT).show();
                     newsScreenViewModel = new ViewModelProvider(this , new NewsFactory(getApplicationContext(),"us","business" )).get(NewsScreenViewModel.class);
                     newsScreenViewModel.getNewsList(new RetrofitResponseListener() {
@@ -275,7 +275,7 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
                 country = CountryFinder.getCountryName(getApplicationContext(),location.getLatitude(),location.getLongitude());
 
 
-                newsScreenViewModel = new ViewModelProvider(this , new NewsFactory(getApplicationContext(),"us","business" )).get(NewsScreenViewModel.class);
+                newsScreenViewModel = new ViewModelProvider(this , new NewsFactory(getApplicationContext(),country,"business" )).get(NewsScreenViewModel.class);
                 newsScreenViewModel.getNewsList(new RetrofitResponseListener() {
                     @Override
                     public void onFailure() {
