@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 
 import android.location.Location;
@@ -12,6 +13,7 @@ import android.location.LocationManager;
 
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,7 +26,10 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.onesignal.OSNotificationOpenResult;
 import com.onesignal.OneSignal;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +37,8 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -136,9 +143,30 @@ public class NewsScreen extends AppCompatActivity implements LocationListener {
     private void onesignalInitialiser() {
         // OneSignal Initialization
         OneSignal.startInit(this)
+
                 .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
                 .unsubscribeWhenNotificationsAreDisabled(true)
+                .setNotificationOpenedHandler(new NotificationOpenHandler())
                 .init();
+    }
+
+    private class NotificationOpenHandler implements OneSignal.NotificationOpenedHandler {
+        // This fires when a notification is opened by tapping on it.
+        @Override
+        public void notificationOpened(OSNotificationOpenResult result) {
+
+
+            Log.d("APP  " +result.notification.payload.launchURL, "Notification clicked");
+            Toast.makeText(getApplicationContext(),""+result,Toast.LENGTH_SHORT).show();
+
+            String url = result.notification.payload.launchURL;
+
+
+            Intent mIntent = new Intent(NewsScreen.this, NotificationWebview.class);
+            mIntent.putExtra("url", url);
+            startActivity(mIntent);
+
+        }
     }
 
     private void adinitialiser() {
